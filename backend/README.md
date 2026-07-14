@@ -62,3 +62,72 @@ The request body must be sent as JSON and include the following fields:
 ### Notes
 - The password is hashed before being stored.
 - A JWT is generated for the newly created user.
+
+---
+
+# User Login Endpoint
+
+## POST /users/login
+
+Authenticates an existing user and returns a JSON Web Token (JWT) along with the authenticated user data.
+
+### Description
+This endpoint verifies the provided email and password, and returns a JWT if the credentials are valid.
+
+### Request Body
+The request body must be sent as JSON and include the following fields:
+
+- `email` (string, required): must be a valid email address
+- `password` (string, required): must be at least 6 characters long
+
+### Example Request
+```json
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+### Success Response
+- **Status Code:** `200 OK`
+- **Example Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.exampleSignature",
+  "user": {
+    "_id": "64f8b2a1c9d0e1234567890a",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john@example.com"
+  }
+}
+```
+
+### Error Responses
+- **Status Code:** `400 Bad Request`
+  - Returned when validation fails or required fields are missing.
+  - Example response:
+```json
+{
+  "errors": [
+    {
+      "msg": "Invalid Email"
+    }
+  ]
+}
+```
+
+- **Status Code:** `401 Unauthorized`
+  - Returned when the email is not found or the password is incorrect.
+  - Example response:
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+### Notes
+- The password is compared against the stored hashed password.
+- A JWT is generated for the authenticated user.
