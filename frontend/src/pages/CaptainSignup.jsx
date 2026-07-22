@@ -160,7 +160,7 @@ const captainsignup = () => {
         <p className='text-center'>Already Have an account?. <Link to='/captain-login' className='text-blue-600'>Log in Here</Link></p>
       </div>
       <div>
-        <p className='text-[10px] leading-tight'>By Proceeding, you consent to get Calls.WhatsApp or SMS message, including by automated means, from Uber and It's affiliate to the number provided</p>
+        <p className='text-[10px] mt-6 leading-tight'>By Proceeding, you consent to get Calls.WhatsApp or SMS message, including by automated means, from Uber and It's affiliate to the number provided</p>
       </div>
     </div>
   )

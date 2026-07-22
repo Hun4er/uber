@@ -133,7 +133,7 @@ const home = () => {
           onChange={(e)=>{
             setPickup(e.target.value)
           }}
-           className='bg-[#eee] px-12 text-lg rounded-lg w-full mt-5'
+           className='bg-[#eee] px-12 text-lg p-3 rounded-lg w-full mt-5'
             type="text" 
             placeholder='Add a pick-up location'/>
           <input 
@@ -144,7 +144,7 @@ const home = () => {
           onChange={(e)=>{
             setDestination(e.target.value)
           }}
-          className='bg-[#eee] px-12 text-lg rounded-lg w-full mt-3' 
+          className='bg-[#eee] px-12 text-lg p-3 rounded-lg w-full mt-3' 
           type="text" 
           placeholder='Enter your destination'/>
         </form>
