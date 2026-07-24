@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const FinishRide = (props) => {
     return (
-        <div>
+        <div className='h-screen'>
             <h5 onClick={() => {
                 props.setFinishRidePanel(false)
             }} className='p-1 text-center w-[93%] absolute top-0'><i className=" text-3xl text-gray-200 ri-arrow-down-wide-line"></i></h5>

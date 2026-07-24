@@ -12,7 +12,7 @@ const CaptainRiding = () => {
     useGSAP(function () {
         if (finishRidePanel) {
             gsap.to(finishRidePanelRef.current, {
-                transform: 'translateY(0)'
+                transform: 'translateY(26%)'
             })
         } else {
             gsap.to(finishRidePanelRef.current, {
