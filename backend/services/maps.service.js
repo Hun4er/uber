@@ -95,3 +95,34 @@ module.exports.getDistanceTime = async (origin, destination) => {
     throw err;
   }
 };
+
+
+module.exports.getAutoCompleteSuggestion = async (input) => {
+    if (!input) {
+        throw new Error("Input is required");
+    }
+
+    const apiKey = process.env.MAP_API_KEY;
+
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(input)}.json`;
+
+    try {
+        const response = await axios.get(url, {
+            params: {
+                access_token: apiKey,
+                autocomplete: true,
+                limit: 10,
+                country: "IN"
+            }
+        });
+
+        return response.data.features.map(feature => ({
+            description: feature.place_name,
+            coordinates: feature.center
+        }));
+
+    } catch (err) {
+        console.log(err.response?.data);
+        throw err;
+    }
+};

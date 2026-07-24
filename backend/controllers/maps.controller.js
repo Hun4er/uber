@@ -30,3 +30,21 @@ module.exports.getDistanceTime = async (req, res, next) => {
         throw err
     }
 }
+
+module.exports.getAutoCompleteSuggestion = async(req, res, next)=>{
+    try{
+        const errors = validationResult(req)
+        if(!errors.isEmpty())
+        {
+            return res. status(400).json({errors:errors.array()})
+        }
+        const {input} = req.query
+        const suggestions = await mapService.getAutoCompleteSuggestion(input)
+        res.status(200).json(suggestions)
+    }catch (err) {
+    console.error("Mapbox Error:");
+    console.error(err.response?.data);
+
+    throw err;
+}
+}
