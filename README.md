@@ -62,3 +62,4 @@ The request body must be sent as JSON and include the following fields:
 ### Notes
 - The password is hashed before being stored.
 - A JWT is generated for the newly created user.
+

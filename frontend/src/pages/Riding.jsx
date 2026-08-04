@@ -1,46 +1,95 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Car from '../assets/Car.png'
-import { Link } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import { useSocket } from '../context/SocketContext'
+import { useNavigate } from 'react-router-dom'
+import LiveTracking from '../components/LiveTracking'
 
 const Riding = () => {
+  const location = useLocation()
+  const ride = location.state?.ride
+  const rideDate = location.state?.rideDate
+  const { receiveMessageFromEvent, connected } = useSocket()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!connected) return undefined
+
+    const unsubscribeEnded = receiveMessageFromEvent('ride-ended', (data) => {
+      console.log('[Riding] ride-ended received', data)
+      navigate('/home')
+    })
+
+    return () => unsubscribeEnded()
+  }, [navigate, receiveMessageFromEvent, connected])
+
+  const captainName = ride?.captain?.fullname?.firstname
+    ? `${ride.captain.fullname.firstname} ${ride.captain.fullname.lastname || ''}`.trim()
+    : 'Captain'
+
   return (
-    <div className='h-screen'>
-      <Link to='/home' className='fixed right-2 top-2 h-10 w-10 bg-white flex items-center justify-center rounded-full'>
-        <i className="text-lg font-medium ri-home-5-line"></i>
-      </Link>
+    <div className='h-screen flex flex-col relative'>
+      {/* Map Area */}
       <div className='h-1/2'>
-        <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1100/format:webp/0*gwMx05pqII5hbfmX.gif" alt="" />
+        <LiveTracking ride={ride} />
       </div>
-      <div className='h-1/2 p-4'>
-        <div className='flex items-center justify-between'>
-          <img className="h-12" src={Car} alt="" />
+
+      {/* Ride Info Panel */}
+      <div className='h-1/2 p-4 bg-white flex flex-col justify-between overflow-y-auto'>
+        {/* Captain Card */}
+        <div className='flex items-center justify-between mb-3 pb-3 border-b-2'>
+          <div className='flex items-center gap-3'>
+            <div className='h-14 w-14 rounded-full bg-gray-200 overflow-hidden'>
+              <img
+                className='h-full w-full object-cover'
+                src="https://imgs.search.brave.com/6Uni_bwf9eee_CFa-w9FmxNw14wGikdBvykZKIRDrKg/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvMjE4/NjM4Mzk4My9waG90/by9wb3J0cmFpdC1j/cmVhdGl2ZS1hbmQt/bWFuLWZvci1wcmlk/ZS1pbi1vZmZpY2Ut/b2YtYWJvdXQtdXMt/c3RhcnR1cC1ncm93/dGgtYW5kLWNhcmVl/ci1hbWJpdGlvbi5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/OGhjQTJGak9iNFlK/VjhJdUJYWm9mbzlh/aVFCWlBiT3dpR2RW/cmNTWXZZND0"
+                alt="Captain"
+              />
+            </div>
+            <div>
+              <h2 className='text-lg font-semibold'>{captainName}</h2>
+              <p className='text-sm text-gray-500'>
+                {ride?.captain?.vehicle?.model || ride?.captain?.vehicle?.vehicleType || 'Vehicle'}
+              </p>
+            </div>
+          </div>
           <div className='text-right'>
-            <h2 className='text-lg font-medium' >Harsh</h2>
-            <h4 className='text-lg font-semibold -mt-1 -mb-1'>HR02 CA 4444</h4>
-            <p className='text-sm text-gray-600'> Honda City </p>
+            <h4 className='text-xl font-bold tracking-widest'>
+              {ride?.captain?.vehicle?.plate || '—'}
+            </h4>
+            <p className='text-xs text-gray-500'>Plate No.</p>
           </div>
         </div>
-        <div className='flex gap-2 justify-between flex-col items-center'>
-          <div className='w-full mt-5'>
 
-            <div className='flex items-center gap-5 p-3 border-b-2'>
-              <i className='ri-map-pin-2-fill' />
-              <div>
-                <h3 className='text-lg font-medium'>562/11</h3>
-                <p className='text-sm -m-1 text-gray-600'>Tdi Lake Grove,Sonipat,Haryana</p>
-              </div>
-            </div>
-            <div className='flex items-center gap-5 p-3 '>
-              <i className="ri-money-rupee-circle-fill"></i>
-              <div>
-                <h3 className='text-lg font-medium'>193</h3>
-                <p className='text-sm -m-1 text-gray-600'>Cash Cash</p>
-              </div>
+        {/* Trip Details */}
+        <div className='flex-1'>
+          <div className='flex items-center gap-4 p-2 border-b'>
+            <i className="ri-map-pin-2-fill text-gray-700"></i>
+            <div>
+              <h3 className='text-sm font-medium text-gray-500'>Destination</h3>
+              <p className='text-base font-semibold'>{ride?.destination || '—'}</p>
             </div>
           </div>
-
+          <div className='flex items-center gap-4 p-2 border-b'>
+            <i className="ri-map-pin-user-line text-gray-700"></i>
+            <div>
+              <h3 className='text-sm font-medium text-gray-500'>Pickup</h3>
+              <p className='text-base font-semibold'>{ride?.pickup || '—'}</p>
+            </div>
+          </div>
+          <div className='flex items-center gap-4 p-2'>
+            <i className="ri-money-rupee-circle-fill text-gray-700"></i>
+            <div>
+              <h3 className='text-sm font-medium text-gray-500'>Fare</h3>
+              <p className='text-base font-semibold'>₹{ride?.fare || 0} &bull; Cash</p>
+            </div>
+          </div>
         </div>
-        <button className='w-full mt-5 bg-green-600 text white font-semibold p-2 rounded-lg'>Make a Payment</button>
+
+        {/* Make Payment Button */}
+        <button className='w-full mt-3 bg-black text-white font-semibold p-3 rounded-xl text-base'>
+          Make a Payment
+        </button>
       </div>
     </div>
   )

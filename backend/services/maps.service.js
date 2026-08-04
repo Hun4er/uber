@@ -1,4 +1,18 @@
 const axios = require('axios');
+const captainModel = require('../models/captain.model');
+
+function toRadians(value) {
+  return value * (Math.PI / 180);
+}
+
+function calculateDistanceInKm(lat1, lng1, lat2, lng2) {
+  const radius = 6371;
+  const dLat = toRadians(lat2 - lat1);
+  const dLng = toRadians(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return radius * c;
+}
 
 module.exports.getAddressCoordinate = async (address) => {
   if (!address || typeof address !== 'string') {
@@ -98,31 +112,54 @@ module.exports.getDistanceTime = async (origin, destination) => {
 
 
 module.exports.getAutoCompleteSuggestion = async (input) => {
-    if (!input) {
-        throw new Error("Input is required");
+  if (!input) {
+    throw new Error("Input is required");
+  }
+
+  const apiKey = process.env.MAP_API_KEY;
+
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(input)}.json`;
+
+  try {
+    const response = await axios.get(url, {
+      params: {
+        access_token: apiKey,
+        autocomplete: true,
+        limit: 10,
+        country: "IN"
+      }
+    });
+
+    return response.data.features.map(feature => ({
+      description: feature.place_name,
+      coordinates: feature.center
+    }));
+
+  } catch (err) {
+    console.log(err.response?.data);
+    throw err;
+  }
+};
+
+module.exports.getCaptainsInRadius = async (lat, lng, radius) => {
+  const captains = await captainModel.find({
+    location: { $exists: true }
+  });
+
+  
+  captains.forEach(c => {
+      const dist = calculateDistanceInKm(lat, lng, c.location.lat, c.location.lng);
+    
+  });
+
+  return captains.filter((captain) => {
+    const captainLat = captain.location?.lat;
+    const captainLng = captain.location?.lng;
+
+    if (!Number.isFinite(captainLat) || !Number.isFinite(captainLng)) {
+      return false;
     }
 
-    const apiKey = process.env.MAP_API_KEY;
-
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(input)}.json`;
-
-    try {
-        const response = await axios.get(url, {
-            params: {
-                access_token: apiKey,
-                autocomplete: true,
-                limit: 10,
-                country: "IN"
-            }
-        });
-
-        return response.data.features.map(feature => ({
-            description: feature.place_name,
-            coordinates: feature.center
-        }));
-
-    } catch (err) {
-        console.log(err.response?.data);
-        throw err;
-    }
+    return calculateDistanceInKm(lat, lng, captainLat, captainLng) <= radius;
+  });
 };

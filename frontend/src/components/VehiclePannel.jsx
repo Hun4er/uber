@@ -4,6 +4,11 @@ import Bike from '../assets/Bike.png'
 import Auto from '../assets/Auto.png'
 
 const VehiclePannel = (props) => {
+  const getFareValue = (vehicleKey, fallback) => {
+    const value = props.fare?.[vehicleKey]
+    return Number.isFinite(Number(value)) ? Number(value).toFixed(0) : fallback
+  }
+
   return (
     <div>
         <h5 onClick={()=>{
@@ -13,6 +18,7 @@ const VehiclePannel = (props) => {
       {/* Car */}
         <div onClick={()=>{
             props.setConfirmRidePannel(true)
+            props.setVehicleType('car')
         }} className='flex border-2 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
           <img className='h-20' src={Car} alt="" />
           <div className='ml-2 w-1/2'>
@@ -20,11 +26,12 @@ const VehiclePannel = (props) => {
             <h5 className='font-medium text-sm' >2 mins away</h5>
               <p className='font-normal text-xs text-gray-600'>Affordable, compact rides</p>
           </div>
-          <h2 className='text-lg font-semibold'>₹193</h2>
+          <h2 className='text-lg font-semibold'>₹{getFareValue('car', 193)}</h2>
         </div>
         {/*Motorcycle */}
           <div onClick={()=>{
             props.setConfirmRidePannel(true)
+           props.setVehicleType('motorcycle')
         }} className='flex border-2 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
           <img className='h-20' src={Bike} alt="" />
           <div className='ml-2 w-1/2'>
@@ -32,12 +39,13 @@ const VehiclePannel = (props) => {
             <h5 className='font-medium text-sm' >3 mins away</h5>
               <p className='font-normal text-xs text-gray-600'>Affordable Bike rides</p>
           </div>
-          <h2 className='text-lg font-semibold'>₹65</h2>
+          <h2 className='text-lg font-semibold'>₹{getFareValue('motorcycle', 65)}</h2>
         </div>
 
         {/*Auto */}
           <div onClick={()=>{
             props.setConfirmRidePannel(true)
+            props.setVehicleType('car')
         }} className='flex border-2 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
           <img className='h-20' src={Auto} alt="" />
           <div className='ml-2 w-1/2'>
@@ -45,7 +53,7 @@ const VehiclePannel = (props) => {
             <h5 className='font-medium text-sm' >1 mins away</h5>
               <p className='font-normal text-xs text-gray-600'>Affordable Auto rides</p>
           </div>
-          <h2 className='text-lg font-semibold'>₹118</h2>
+          <h2 className='text-lg font-semibold'>₹{getFareValue('auto', 118)}</h2>
         </div>
     </div>
   )

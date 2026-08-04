@@ -370,3 +370,65 @@ Status: `200 OK`
 - Passwords are hashed before being stored.
 - A JWT is generated for successful register and login requests.
 - The captain routes are implemented in [backend/routes/captain.route.js](backend/routes/captain.route.js).
+
+
+# Get Fare Endpoint
+
+## GET /rides/get-fare
+
+Calculates an estimated fare for a ride between a pickup location and a destination.
+
+### Description
+This endpoint requires an authenticated user and uses the map service to estimate distance and travel time before returning fare estimates for the supported vehicle types.
+
+### Authentication
+- Requires a valid JWT token.
+- The token can be provided via the `Authorization` header as a Bearer token or through the `token` cookie.
+
+### Query Parameters
+- `pickup` (string, required): pickup address; must be at least 3 characters long
+- `destination` (string, required): destination address; must be at least 3 characters long
+
+### Example Request
+```http
+GET /rides/get-fare?pickup=Delhi&destination=Gurgaon
+```
+
+### Success Response
+- **Status Code:** `200 OK`
+- **Example Response:**
+```json
+{
+  "auto": 125.5,
+  "car": 185.25,
+  "motorcycle": 82.3
+}
+```
+
+### Error Responses
+- **Status Code:** `400 Bad Request`
+  - Returned when the pickup or destination query parameters are missing or invalid.
+  - Example response:
+```json
+{
+  "errors": [
+    {
+      "msg": "Invalid Pickup Address"
+    }
+  ]
+}
+```
+
+- **Status Code:** `500 Internal Server Error`
+  - Returned when fare calculation fails.
+  - Example response:
+```json
+{
+  "message": "Pickup and destination are required"
+}
+```
+
+### Notes
+- The fare is estimated using route distance and travel duration.
+- Returned values are numeric estimates for `auto`, `car`, and `motorcycle`.
+
